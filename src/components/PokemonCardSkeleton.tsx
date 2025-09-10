@@ -7,15 +7,16 @@ export default function PokemonCardSkeleton() {
       </div>
 
       {/* Texto */}
-      <div className="p-4 flex flex-col gap-4">
+      <div className="py-4 px-2 flex flex-col gap-4">
         <div className="h-4 w-24 bg-gray-400 rounded" />
 
         {/* Tags */}
-        <div className="flex gap-2 justify-between text-[13px]">
+        <div className="flex gap-2 justify-between text-xs">
           <div className="h-6 w-20 bg-gray-400 rounded-full" />
           <div className="h-6 w-20 bg-gray-400 rounded-full" />
         </div>
       </div>
+      <span className="text-black font-bold w-2/5 mx-auto h-1 bg-gray-300 rounded-full" />
     </div>
   );
 }
