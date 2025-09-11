@@ -9,6 +9,7 @@ import { DEFAULT_LIMIT, DEFAULT_OFFSET } from "@/lib/api";
 import type { PokemonProps } from "@/lib/types";
 import TypeFilter from "@/components/TypeFilter";
 import GenerationFilter from "@/components/GenerationFilter";
+import SearchFilter from "@/components/SearchFilter";
 
 export default function PokemonGrid() {
   const router = useRouter();
@@ -53,11 +54,12 @@ export default function PokemonGrid() {
 
       {/* Filtros */}
       <div className="mb-6 flex flex-col sm:flex-row gap-4">
-        <p className="text-white">Filtros</p>
         <TypeFilter />
+        <SearchFilter />
         <GenerationFilter />
       </div>
 
+      {/* Grid de Pokémon */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mt-4">
         {loading
           ? Array.from({ length: limit }).map((_, i) => (
@@ -70,6 +72,8 @@ export default function PokemonGrid() {
               <PokemonCard key={p.id ?? p.name} name={p.name} />
             ))}
       </div>
+
+      {/* Paginación */}
       {!loading && pokemons.length > 0 && (
         <Pagination
           hasPrev={offset > 0}

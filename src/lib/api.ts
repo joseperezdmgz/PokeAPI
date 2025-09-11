@@ -46,3 +46,19 @@ export async function getPokemonCardData(
     bgClass: bgClass,
   };
 }
+
+export async function getTypes(name?: string) {
+  const res = await fetch(
+    `${API_URL}type?${name ? `/${name}` : "/?limit=100"}`
+  );
+  const data = await res.json();
+  return data.results;
+}
+
+export async function getGenerations(name?: string) {
+  const res = await fetch(
+    `${API_URL}generation?${name ? `/${name}` : "/?limit=100"}`
+  );
+  const data = await res.json();
+  return data.results;
+}
