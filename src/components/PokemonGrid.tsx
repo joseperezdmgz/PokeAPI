@@ -1,25 +1,33 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import PokemonCard from "@/components/PokemonCard";
 import { getListPokemon } from "@/lib/api";
 import Pagination from "@/components/Pagination";
+import { DEFAULT_LIMIT } from "@/lib/api";
 
 export default function PokemonGrid() {
-  const [pokemons, setPokemons] = useState<any[]>([]);
-  const [nextUrl, setNextUrl] = useState<string | null>(null);
-  const [prevUrl, setPrevUrl] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const fetchPage = async (url?: string | null) => {
-    const data = await getListPokemon(url || undefined);
+  const limit = Number(searchParams.get("limit")) || DEFAULT_LIMIT;
+  const offset = Number(searchParams.get("offset"));
+
+  const [pokemons, setPokemons] = useState<any[]>([]);
+  const [count, setCount] = useState(0);
+
+  const fetchPage = async (newOffset: number) => {
+    const data = await getListPokemon(undefined, newOffset, limit);
     setPokemons(data.results);
-    setNextUrl(data.next);
-    setPrevUrl(data.previous);
+    setCount(data.count);
+
+    router.push(`/?offset=${newOffset}&limit=${limit}`);
   };
 
   useEffect(() => {
-    fetchPage();
-  }, []);
+    fetchPage(offset);
+  }, [offset, limit]);
 
   return (
     <>
@@ -29,10 +37,10 @@ export default function PokemonGrid() {
         ))}
       </div>
       <Pagination
-        hasPrev={!!prevUrl}
-        hasNext={!!nextUrl}
-        onPrev={() => fetchPage(prevUrl)}
-        onNext={() => fetchPage(nextUrl)}
+        hasPrev={offset > 0}
+        hasNext={offset + limit < count}
+        onPrev={() => fetchPage(offset - limit)}
+        onNext={() => fetchPage(offset + limit)}
       />
     </>
   );

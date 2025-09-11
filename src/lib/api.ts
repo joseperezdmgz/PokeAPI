@@ -2,7 +2,7 @@ import { PokemonCardProps } from "@/lib/types";
 import { typeColors, typeMap, generationMap } from "@/lib/translation";
 
 const API_URL = process.env.API_URL;
-const DEFAULT_LIMIT = 20;
+export const DEFAULT_LIMIT = 20;
 
 export async function getListPokemon(
   url?: string,
@@ -26,7 +26,7 @@ export async function getPokemonCardData(
   const pokemon = await res.json();
 
   const types = pokemon.types.map((t: any) => typeMap[t.type.name]).join(", ");
-  const sprite = pokemon.sprites.other.dream_world.front_default;
+  const sprite = pokemon.sprites.other.dream_world.front_default || pokemon.sprites.front_default;
 
   const speciesRes = await fetch(`${API_URL}pokemon-species/${name}`);
   const species = await speciesRes.json();
