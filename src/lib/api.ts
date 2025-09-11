@@ -1,6 +1,5 @@
 import { PokemonCardProps } from "@/lib/types";
 import { typeColors } from "@/lib/translation";
-import { types } from "util";
 
 const API_URL = process.env.API_URL;
 export const DEFAULT_LIMIT = 20;
@@ -31,10 +30,9 @@ export async function getPokemonCardData(
     pokemon.sprites.other.dream_world.front_default ||
     pokemon.sprites.front_default;
 
-  const speciesRes = await fetch(`${API_URL}pokemon-species/${pokemon.id}`);
+  const speciesRes = await fetch(pokemon.species.url);
   const species = await speciesRes.json();
 
-  const generation = species.generation.name;
   const bgClass = typeColors[pokemon.types[0].type.name] || typeColors.normal;
 
   return {
@@ -42,7 +40,7 @@ export async function getPokemonCardData(
     name: pokemon.name,
     sprite,
     types: pokemon.types,
-    generation,
-    bgClass,
+    generation: species.generation.name,
+    bgClass: bgClass,
   };
 }

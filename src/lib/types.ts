@@ -2,7 +2,7 @@ export interface PokemonCardProps {
   id: number;
   name: string;
   sprite: string;
-  types: string[];
+  types: { type: { name: string } }[];
   generation: string;
   bgClass: string;
 }
