@@ -67,6 +67,9 @@ export default function PokemonGrid() {
           hasNext={offset + limit < count}
           onPrev={() => fetchPage(offset - limit)}
           onNext={() => fetchPage(offset + limit)}
+          limit={limit}
+          offset={offset}
+          router={router}
         />
       )}
     </>
