@@ -2,6 +2,7 @@ import { PokemonCardProps } from "@/lib/types";
 import { typeColors, typeMap, generationMap } from "@/lib/translation";
 
 const API_URL = process.env.API_URL;
+const DEFAULT_LIMIT = 20;
 
 export async function getListPokemon(
   url?: string,
@@ -9,7 +10,9 @@ export async function getListPokemon(
   limit?: number
 ) {
   const res = await fetch(
-    `${url || API_URL}pokemon?offset=${offset || 0}&limit=${limit || 20}`
+    `${url || API_URL}pokemon?offset=${offset || 0}&limit=${
+      limit || DEFAULT_LIMIT
+    }`
   );
   const data = await res.json();
 

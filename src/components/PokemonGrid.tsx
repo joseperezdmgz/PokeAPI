@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import PokemonCard from "@/components/PokemonCard";
 import { getListPokemon } from "@/lib/api";
-import Pagination from "./Pagination";
+import Pagination from "@/components/Pagination";
 
 export default function PokemonGrid() {
   const [pokemons, setPokemons] = useState<any[]>([]);
