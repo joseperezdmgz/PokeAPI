@@ -7,13 +7,19 @@ export const DEFAULT_OFFSET = 0;
 
 export async function getListPokemon(
   url?: string,
-  offset?: number,
-  limit?: number
+  offset?: string,
+  limit?: string,
+  type?: string,
+  generation?: string,
+  search?: string
 ) {
   const res = await fetch(
     `${url || API_URL}pokemon?offset=${offset || DEFAULT_OFFSET}&limit=${
       limit || DEFAULT_LIMIT
-    }`
+    }
+    ${type ? `&type=${type}` : ""}
+    ${generation ? `&generation=${generation}` : ""}
+    ${search ? `&search=${search}` : ""}`
   );
   const data = await res.json();
 

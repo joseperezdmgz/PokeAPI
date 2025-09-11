@@ -15,19 +15,37 @@ export default function PokemonGrid() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const limit = Number(searchParams.get("limit")) || DEFAULT_LIMIT;
-  const offset = Number(searchParams.get("offset")) || DEFAULT_OFFSET;
-
   const [pokemons, setPokemons] = useState<PokemonProps[]>([]);
-  const [count, setCount] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [count, setCount] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchPage = (newOffset: number) => {
-    const safeOffset = Math.max(newOffset, 0);
-    router.push(`/?offset=${safeOffset}&limit=${limit}`);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const [limit, setLimit] = useState<number>(
+    Number(searchParams.get("limit")) || DEFAULT_LIMIT
+  );
+  const [offset, setOffset] = useState<number>(
+    Number(searchParams.get("offset")) || DEFAULT_OFFSET
+  );
+  const [type, setType] = useState<string>(searchParams.get("type") || "");
+  const [generation, setGeneration] = useState<string>(
+    searchParams.get("generation") || ""
+  );
+  const [search, setSearch] = useState<string>(
+    searchParams.get("search") || ""
+  );
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (type) params.set("type", type);
+    if (generation) params.set("generation", generation);
+    if (search) params.set("search", search);
+
+    params.set("offset", offset.toString());
+    params.set("limit", limit.toString());
+
+    router.replace(`/?${params.toString()}`);
+  }, [type, generation, search, offset, limit, router]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -35,7 +53,15 @@ export default function PokemonGrid() {
         setLoading(true);
         setError(null);
 
-        const data = await getListPokemon(undefined, offset, limit);
+        const data = await getListPokemon(
+          "",
+          offset.toString(),
+          limit.toString(),
+          type,
+          generation,
+          search
+        );
+
         setPokemons(data.results);
         setCount(data.count);
       } catch (err) {
@@ -46,7 +72,12 @@ export default function PokemonGrid() {
       }
     };
     loadData();
-  }, [offset, limit]);
+  }, [offset, limit, type, generation, search]);
+
+  const fetchPage = (newOffset: string) => {
+    setOffset(Math.max(Number(newOffset), 0));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <>
@@ -54,9 +85,12 @@ export default function PokemonGrid() {
 
       {/* Filtros */}
       <div className="mb-6 flex flex-col sm:flex-row gap-4">
-        <TypeFilter />
-        <SearchFilter />
-        <GenerationFilter />
+        <TypeFilter type={type} setType={setType} />
+        <SearchFilter search={search} setSearch={setSearch} />
+        <GenerationFilter
+          generation={generation}
+          setGeneration={setGeneration}
+        />
       </div>
 
       {/* Grid de Pokémon */}
@@ -76,13 +110,13 @@ export default function PokemonGrid() {
       {/* Paginación */}
       {!loading && pokemons.length > 0 && (
         <Pagination
-          hasPrev={offset > 0}
-          hasNext={offset + limit < count}
-          onPrev={() => fetchPage(offset - limit)}
-          onNext={() => fetchPage(offset + limit)}
+          count={count}
+          onPrev={() => fetchPage((Number(offset) - Number(limit)).toString())}
+          onNext={() => fetchPage((Number(offset) + Number(limit)).toString())}
           limit={limit}
+          onLimitChange={setLimit}
           offset={offset}
-          router={router}
+          onOffsetChange={setOffset}
         />
       )}
     </>
