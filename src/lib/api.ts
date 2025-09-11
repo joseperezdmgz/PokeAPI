@@ -7,23 +7,73 @@ export const DEFAULT_OFFSET = 0;
 
 export async function getListPokemon(
   url?: string,
-  offset?: string,
-  limit?: string,
+  offset: string = DEFAULT_OFFSET.toString(),
+  limit: string = DEFAULT_LIMIT.toString(),
   type?: string,
   generation?: string,
   search?: string
 ) {
+  let results: any[] = [];
+
   const res = await fetch(
-    `${url || API_URL}pokemon?offset=${offset || DEFAULT_OFFSET}&limit=${
-      limit || DEFAULT_LIMIT
-    }
-    ${type ? `&type=${type}` : ""}
-    ${generation ? `&generation=${generation}` : ""}
-    ${search ? `&search=${search}` : ""}`
+    `${url || API_URL}pokemon?offset=${offset}&limit=${limit}`
   );
   const data = await res.json();
+  results = data.results;
 
-  return data;
+  if (type) {
+    const resType = await fetch(`${API_URL}type/${type}`);
+    const dataType = await resType.json();
+    const pokemonOfType = dataType.pokemon.map((p: any) => p.pokemon.name);
+    results = results.filter((p) => pokemonOfType.includes(p.name));
+  }
+
+  if (generation) {
+    const resGen = await fetch(`${API_URL}generation/${generation}`);
+    const dataGen = await resGen.json();
+    const pokemonOfGen = dataGen.pokemon_species.map((p: any) => p.name);
+    results = results.filter((p) => pokemonOfGen.includes(p.name));
+  }
+
+  if (search) {
+    results = results.filter((p) =>
+      p.name.toLowerCase().includes(search.toLowerCase())
+    );
+  }
+
+  const start = Number(offset);
+  const end = start + Number(limit);
+  const paginated = results.slice(start, end);
+
+  const detailedResults = await Promise.all(
+    paginated.map(async (pokemon: { name: string; url: string }) => {
+      const resPokemon = await fetch(pokemon.url);
+      const pokeData = await resPokemon.json();
+
+      const resSpecies = await fetch(pokeData.species.url);
+      const species = await resSpecies.json();
+
+      const sprite =
+        pokeData.sprites.other["official-artwork"].front_default ||
+        pokeData.sprites.front_default;
+
+      const bgClass = `bg-${pokeData.types[0].type.name}-500`;
+
+      return {
+        id: pokeData.id,
+        name: pokeData.name,
+        sprite,
+        types: pokeData.types,
+        generation: species.generation.name,
+        bgClass,
+      };
+    })
+  );
+
+  return {
+    results: detailedResults,
+    count: results.length,
+  };
 }
 
 export async function getPokemonCardData(

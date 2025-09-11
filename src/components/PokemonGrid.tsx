@@ -82,6 +82,9 @@ export default function PokemonGrid() {
   return (
     <>
       {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+      <div className="w-full flex justify-end">
+        <p>Total: {count || 'Cargando...'}</p>
+      </div>
 
       {/* Filtros */}
       <div className="mb-6 flex flex-col sm:flex-row gap-4">
