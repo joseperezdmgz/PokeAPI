@@ -46,12 +46,12 @@ export default function PokemonCard({ name }: { name: string }) {
       <div
         className={`${data.bgClass} flex justify-center items-center relative rounded-2xl overflow-hidden group-hover:overflow-visible transition-transform`}
       >
-        <img src={data.sprite} alt={name} className="w-full h-64 group-hover:scale-110 transition-transform group-hover:z-10" />
+        <img src={data.sprite} alt={name} className="w-full h-64 group-hover:scale-120 transition-transform group-hover:z-10" />
         <span className="absolute top-2 right-2 text-white border p-1 text-xs rounded">
           #{data.id.toString().padStart(3, "0")}
         </span>
-        <span className="absolute bottom-2 right-2 text-white border p-1 text-xs rounded">
-          {data.generation}
+        <span className="absolute bottom-2 right-2 text-white border-black p-1 text-xs rounded opacity-100 bg-black/50 backdrop-blur-lg shadow">
+          {data.generation.split("-").join(" ").toUpperCase()}
         </span>
       </div>
       <div className="py-4 px-1 flex flex-col gap-4">

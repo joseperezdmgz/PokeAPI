@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
+import Header from "@/components/Header";
 
 export const metadata: Metadata = {
   title: "PokeAPI",
@@ -14,6 +15,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className="antialiased bg-gray-50 min-h-screen w-4/5 mx-auto">
+        <Header />
         {children}
       </body>
     </html>

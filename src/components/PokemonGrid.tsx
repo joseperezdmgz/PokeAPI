@@ -7,6 +7,8 @@ import { getListPokemon } from "@/lib/api";
 import Pagination from "@/components/Pagination";
 import { DEFAULT_LIMIT, DEFAULT_OFFSET } from "@/lib/api";
 import type { PokemonProps } from "@/lib/types";
+import TypeFilter from "@/components/TypeFilter";
+import GenerationFilter from "@/components/GenerationFilter";
 
 export default function PokemonGrid() {
   const router = useRouter();
@@ -48,6 +50,13 @@ export default function PokemonGrid() {
   return (
     <>
       {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+
+      {/* Filtros */}
+      <div className="mb-6 flex flex-col sm:flex-row gap-4">
+        <p className="text-white">Filtros</p>
+        <TypeFilter />
+        <GenerationFilter />
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mt-4">
         {loading
