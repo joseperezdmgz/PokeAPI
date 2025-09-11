@@ -5,43 +5,70 @@ import { useRouter, useSearchParams } from "next/navigation";
 import PokemonCard from "@/components/PokemonCard";
 import { getListPokemon } from "@/lib/api";
 import Pagination from "@/components/Pagination";
-import { DEFAULT_LIMIT } from "@/lib/api";
+import { DEFAULT_LIMIT, DEFAULT_OFFSET } from "@/lib/api";
+import type { PokemonProps } from "@/lib/types";
 
 export default function PokemonGrid() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const limit = Number(searchParams.get("limit")) || DEFAULT_LIMIT;
-  const offset = Number(searchParams.get("offset"));
+  const offset = Number(searchParams.get("offset")) || DEFAULT_OFFSET;
 
-  const [pokemons, setPokemons] = useState<any[]>([]);
+  const [pokemons, setPokemons] = useState<PokemonProps[]>([]);
   const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchPage = async (newOffset: number) => {
-    const data = await getListPokemon(undefined, newOffset, limit);
-    setPokemons(data.results);
-    setCount(data.count);
-
-    router.push(`/?offset=${newOffset}&limit=${limit}`);
+  const fetchPage = (newOffset: number) => {
+    const safeOffset = Math.max(newOffset, 0);
+    router.push(`/?offset=${safeOffset}&limit=${limit}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   useEffect(() => {
-    fetchPage(offset);
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const data = await getListPokemon(undefined, offset, limit);
+        setPokemons(data.results);
+        setCount(data.count);
+      } catch (err) {
+        console.error("Error fetching Pokémon:", err);
+        setError("No se pudieron cargar los Pokémon. Inténtalo de nuevo.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
   }, [offset, limit]);
 
   return (
     <>
+      {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mt-4">
-        {pokemons.map((p) => (
-          <PokemonCard key={p.name} name={p.name} />
-        ))}
+        {loading
+          ? Array.from({ length: limit }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-gray-300 rounded-2xl animate-pulse h-72"
+              />
+            ))
+          : pokemons.map((p) => (
+              <PokemonCard key={p.id ?? p.name} name={p.name} />
+            ))}
       </div>
-      <Pagination
-        hasPrev={offset > 0}
-        hasNext={offset + limit < count}
-        onPrev={() => fetchPage(offset - limit)}
-        onNext={() => fetchPage(offset + limit)}
-      />
+      {!loading && pokemons.length > 0 && (
+        <Pagination
+          hasPrev={offset > 0}
+          hasNext={offset + limit < count}
+          onPrev={() => fetchPage(offset - limit)}
+          onNext={() => fetchPage(offset + limit)}
+        />
+      )}
     </>
   );
 }

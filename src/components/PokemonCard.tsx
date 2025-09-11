@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getPokemonCardData } from "@/lib/api";
 import PokemonCardSkeleton from "@/components/PokemonCardSkeleton";
+import { typeColors } from "@/lib/translation";
 
 export default function PokemonCard({ name }: { name: string }) {
   const [data, setData] = useState<any>(null);
@@ -29,13 +30,15 @@ export default function PokemonCard({ name }: { name: string }) {
       </div>
       <div className="py-4 px-1 flex flex-col gap-4">
         <p className="capitalize text-black font-bold">{name}</p>
-        <div className="flex gap-2 justify-between text-xs">
-          <span className="text-black bg-yellow-400 px-2 py-1 rounded-full">
-            {data.generation || "N/A"}
-          </span>
-          <span className="text-white bg-purple-600 px-2 py-1 rounded-full">
-            {data.types}
-          </span>
+        <div className="flex gap-2 text-xs">
+          {data.types.map((type: any) => (
+            <span
+              key={type.type.name}
+              className={`${typeColors[type.type.name]} px-2 py-1 rounded-full capitalize`}
+            >
+              {type.type.name}
+            </span>
+          ))}
         </div>
       </div>
       <span className="text-black font-bold w-2/5 mx-auto h-1 bg-gray-300 rounded-full" />

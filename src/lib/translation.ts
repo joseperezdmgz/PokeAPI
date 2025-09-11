@@ -4,7 +4,7 @@ export const typeColors: Record<string, string> = {
   water: "bg-blue-500",
   electric: "bg-yellow-400",
   grass: "bg-green-500",
-  ice: "bg-teal-200",
+  ice: "bg-teal-200 text-black",
   fighting: "bg-orange-600",
   poison: "bg-purple-500",
   ground: "bg-yellow-700",
@@ -17,36 +17,4 @@ export const typeColors: Record<string, string> = {
   dark: "bg-gray-800",
   steel: "bg-gray-500",
   fairy: "bg-pink-300",
-};
-
-export const typeMap: Record<string, string> = {
-  normal: "Normal",
-  fire: "Fuego",
-  water: "Agua",
-  electric: "Eléctrico",
-  grass: "Planta",
-  ice: "Hielo",
-  fighting: "Lucha",
-  poison: "Veneno",
-  ground: "Tierra",
-  flying: "Volador",
-  psychic: "Psíquico",
-  bug: "Bicho",
-  rock: "Roca",
-  ghost: "Fantasma",
-  dragon: "Dragón",
-  dark: "Siniestro",
-  steel: "Acero",
-  fairy: "Hada",
-};
-
-export const generationMap: Record<string, string> = {
-  "generation-i": "Generación 1",
-  "generation-ii": "Generación 2",
-  "generation-iii": "Generación 3",
-  "generation-iv": "Generación 4",
-  "generation-v": "Generación 5",
-  "generation-vi": "Generación 6",
-  "generation-vii": "Generación 7",
-  "generation-viii": "Generación 8",
 };

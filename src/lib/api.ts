@@ -1,8 +1,10 @@
 import { PokemonCardProps } from "@/lib/types";
-import { typeColors, typeMap, generationMap } from "@/lib/translation";
+import { typeColors } from "@/lib/translation";
+import { types } from "util";
 
 const API_URL = process.env.API_URL;
 export const DEFAULT_LIMIT = 20;
+export const DEFAULT_OFFSET = 0;
 
 export async function getListPokemon(
   url?: string,
@@ -10,7 +12,7 @@ export async function getListPokemon(
   limit?: number
 ) {
   const res = await fetch(
-    `${url || API_URL}pokemon?offset=${offset || 0}&limit=${
+    `${url || API_URL}pokemon?offset=${offset || DEFAULT_OFFSET}&limit=${
       limit || DEFAULT_LIMIT
     }`
   );
@@ -25,7 +27,6 @@ export async function getPokemonCardData(
   const res = await fetch(`${API_URL}pokemon/${name}`);
   const pokemon = await res.json();
 
-  const types = pokemon.types.map((t: any) => typeMap[t.type.name]).join(", ");
   const sprite =
     pokemon.sprites.other.dream_world.front_default ||
     pokemon.sprites.front_default;
@@ -33,14 +34,14 @@ export async function getPokemonCardData(
   const speciesRes = await fetch(`${API_URL}pokemon-species/${pokemon.id}`);
   const species = await speciesRes.json();
 
-  const generation = generationMap[species.generation.name];
+  const generation = species.generation.name;
   const bgClass = typeColors[pokemon.types[0].type.name] || typeColors.normal;
 
   return {
     id: pokemon.id,
     name: pokemon.name,
     sprite,
-    types,
+    types: pokemon.types,
     generation,
     bgClass,
   };
