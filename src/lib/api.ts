@@ -26,10 +26,13 @@ export async function getPokemonCardData(
   const pokemon = await res.json();
 
   const types = pokemon.types.map((t: any) => typeMap[t.type.name]).join(", ");
-  const sprite = pokemon.sprites.other.dream_world.front_default || pokemon.sprites.front_default;
+  const sprite =
+    pokemon.sprites.other.dream_world.front_default ||
+    pokemon.sprites.front_default;
 
-  const speciesRes = await fetch(`${API_URL}pokemon-species/${name}`);
+  const speciesRes = await fetch(`${API_URL}pokemon-species/${pokemon.id}`);
   const species = await speciesRes.json();
+
   const generation = generationMap[species.generation.name];
   const bgClass = typeColors[pokemon.types[0].type.name] || typeColors.normal;
 

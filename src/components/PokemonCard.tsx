@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getPokemonCardData } from "@/lib/api";
-import PokemonCardSkeleton from "./PokemonCardSkeleton";
+import PokemonCardSkeleton from "@/components/PokemonCardSkeleton";
 
 export default function PokemonCard({ name }: { name: string }) {
   const [data, setData] = useState<any>(null);
@@ -31,7 +31,7 @@ export default function PokemonCard({ name }: { name: string }) {
         <p className="capitalize text-black font-bold">{name}</p>
         <div className="flex gap-2 justify-between text-xs">
           <span className="text-black bg-yellow-400 px-2 py-1 rounded-full">
-            {data.generation}
+            {data.generation || "N/A"}
           </span>
           <span className="text-white bg-purple-600 px-2 py-1 rounded-full">
             {data.types}
