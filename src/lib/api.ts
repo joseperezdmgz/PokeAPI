@@ -6,47 +6,44 @@ export const DEFAULT_LIMIT = 20;
 export const DEFAULT_OFFSET = 0;
 
 export async function getListPokemon(
-  url?: string,
   offset: string = DEFAULT_OFFSET.toString(),
   limit: string = DEFAULT_LIMIT.toString(),
   type?: string,
   generation?: string,
   search?: string
 ) {
-  let results: any[] = [];
+  let allPokemon: any[] = [];
 
-  const res = await fetch(
-    `${url || API_URL}pokemon?offset=${offset}&limit=${limit}`
-  );
-  const data = await res.json();
-  results = data.results;
+  const resAll = await fetch(`${API_URL}pokemon?limit=100000`);
+  const dataAll = await resAll.json();
+  allPokemon = dataAll.results;
 
   if (type) {
     const resType = await fetch(`${API_URL}type/${type}`);
     const dataType = await resType.json();
     const pokemonOfType = dataType.pokemon.map((p: any) => p.pokemon.name);
-    results = results.filter((p) => pokemonOfType.includes(p.name));
+    allPokemon = allPokemon.filter((p) => pokemonOfType.includes(p.name));
   }
 
   if (generation) {
     const resGen = await fetch(`${API_URL}generation/${generation}`);
     const dataGen = await resGen.json();
     const pokemonOfGen = dataGen.pokemon_species.map((p: any) => p.name);
-    results = results.filter((p) => pokemonOfGen.includes(p.name));
+    allPokemon = allPokemon.filter((p) => pokemonOfGen.includes(p.name));
   }
 
   if (search) {
-    results = results.filter((p) =>
+    allPokemon = allPokemon.filter((p) =>
       p.name.toLowerCase().includes(search.toLowerCase())
     );
   }
 
   const start = Number(offset);
   const end = start + Number(limit);
-  const paginated = results.slice(start, end);
+  const paginatedPokemon = allPokemon.slice(start, end);
 
   const detailedResults = await Promise.all(
-    paginated.map(async (pokemon: { name: string; url: string }) => {
+    paginatedPokemon.map(async (pokemon: { name: string; url: string }) => {
       const resPokemon = await fetch(pokemon.url);
       const pokeData = await resPokemon.json();
 
@@ -72,7 +69,7 @@ export async function getListPokemon(
 
   return {
     results: detailedResults,
-    count: results.length,
+    count: allPokemon.length,
   };
 }
 

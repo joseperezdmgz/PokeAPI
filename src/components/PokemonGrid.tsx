@@ -1,31 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PokemonCard from "@/components/PokemonCard";
-import { getListPokemon } from "@/lib/api";
-import Pagination from "@/components/Pagination";
-import { DEFAULT_LIMIT, DEFAULT_OFFSET } from "@/lib/api";
+import { getListPokemon, DEFAULT_LIMIT } from "@/lib/api";
 import type { PokemonProps } from "@/lib/types";
 import TypeFilter from "@/components/TypeFilter";
 import GenerationFilter from "@/components/GenerationFilter";
 import SearchFilter from "@/components/SearchFilter";
+import { formatGenerationName } from "@/utils/format";
+import ButtonScrollTop from "@/components/ButtonScrollTop";
 
 export default function PokemonGrid() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const loaderRef = useRef<HTMLDivElement>(null);
 
   const [pokemons, setPokemons] = useState<PokemonProps[]>([]);
   const [count, setCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [limit, setLimit] = useState<number>(
-    Number(searchParams.get("limit")) || DEFAULT_LIMIT
-  );
-  const [offset, setOffset] = useState<number>(
-    Number(searchParams.get("offset")) || DEFAULT_OFFSET
-  );
+  const [offset, setOffset] = useState<number>(0);
+  const [limit] = useState<number>(DEFAULT_LIMIT);
   const [type, setType] = useState<string>(searchParams.get("type") || "");
   const [generation, setGeneration] = useState<string>(
     searchParams.get("generation") || ""
@@ -36,16 +33,13 @@ export default function PokemonGrid() {
 
   useEffect(() => {
     const params = new URLSearchParams();
-
     if (type) params.set("type", type);
     if (generation) params.set("generation", generation);
     if (search) params.set("search", search);
-
-    params.set("offset", offset.toString());
-    params.set("limit", limit.toString());
-
     router.replace(`/?${params.toString()}`);
-  }, [type, generation, search, offset, limit, router]);
+    setPokemons([]);
+    setOffset(0);
+  }, [type, generation, search, router]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -54,7 +48,6 @@ export default function PokemonGrid() {
         setError(null);
 
         const data = await getListPokemon(
-          "",
           offset.toString(),
           limit.toString(),
           type,
@@ -62,10 +55,10 @@ export default function PokemonGrid() {
           search
         );
 
-        setPokemons(data.results);
+        setPokemons((prev) => [...prev, ...data.results]);
         setCount(data.count);
       } catch (err) {
-        console.error("Error fetching Pokémon:", err);
+        console.error(err);
         setError("No se pudieron cargar los Pokémon. Inténtalo de nuevo.");
       } finally {
         setLoading(false);
@@ -74,19 +67,67 @@ export default function PokemonGrid() {
     loadData();
   }, [offset, limit, type, generation, search]);
 
-  const fetchPage = (newOffset: string) => {
-    setOffset(Math.max(Number(newOffset), 0));
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  useEffect(() => {
+    if (!loaderRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading && pokemons.length < count) {
+          setOffset((prev) => prev + limit);
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(loaderRef.current);
+    return () => {
+      if (loaderRef.current) observer.unobserve(loaderRef.current);
+    };
+  }, [loading, pokemons.length, count, limit]);
 
   return (
     <>
       {error && <p className="text-red-500 text-center mt-4">{error}</p>}
-      <div className="w-full flex justify-end">
-        <p>Total: {count || 'Cargando...'}</p>
-      </div>
 
       {/* Filtros */}
+      {type || generation || search ? (
+        <div className="mb-6 flex flex-col sm:flex-row gap-4">
+          {type && (
+            <button
+              className="bg-red-500 px-4 py-2 rounded text-white capitalize"
+              onClick={() => {
+                setType("");
+                router.replace("/");
+              }}
+            >
+              X {type}
+            </button>
+          )}
+          {generation && (
+            <button
+              className="bg-red-500 px-4 py-2 rounded text-white"
+              onClick={() => {
+                setGeneration("");
+                router.replace("/");
+              }}
+            >
+              X {formatGenerationName(generation)}
+            </button>
+          )}
+          {search && (
+            <button
+              className="bg-red-500 px-4 py-2 rounded text-white"
+              onClick={() => {
+                setSearch("");
+                router.replace("/");
+              }}
+            >
+              X {search}
+            </button>
+          )}
+        </div>
+      ) : null}
+
       <div className="mb-6 flex flex-col sm:flex-row gap-4">
         <TypeFilter type={type} setType={setType} />
         <SearchFilter search={search} setSearch={setSearch} />
@@ -98,30 +139,30 @@ export default function PokemonGrid() {
 
       {/* Grid de Pokémon */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mt-4">
-        {loading
-          ? Array.from({ length: limit }).map((_, i) => (
-              <div
-                key={i}
-                className="bg-gray-300 rounded-2xl animate-pulse h-72"
-              />
-            ))
-          : pokemons.map((p) => (
-              <PokemonCard key={p.id ?? p.name} name={p.name} />
-            ))}
+        {pokemons.map((p) => (
+          <PokemonCard key={p.id ?? p.name} name={p.name} />
+        ))}
+
+        {loading &&
+          Array.from({ length: limit }).map((_, i) => (
+            <div
+              key={i}
+              className="bg-gray-300 rounded-2xl animate-pulse h-72"
+            />
+          ))}
       </div>
 
-      {/* Paginación */}
-      {!loading && pokemons.length > 0 && (
-        <Pagination
-          count={count}
-          onPrev={() => fetchPage((Number(offset) - Number(limit)).toString())}
-          onNext={() => fetchPage((Number(offset) + Number(limit)).toString())}
-          limit={limit}
-          onLimitChange={setLimit}
-          offset={offset}
-          onOffsetChange={setOffset}
+      {offset >= 20 ? (
+        <ButtonScrollTop
+          onScrollTop={() => {
+            setOffset(0);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
         />
-      )}
+      ) : null}
+
+      {/* Sentinel div para detectar final */}
+      <div ref={loaderRef} style={{ height: 1 }} />
     </>
   );
 }
