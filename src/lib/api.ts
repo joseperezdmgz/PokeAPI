@@ -10,7 +10,7 @@ export async function getListPokemon(
   limit: string = DEFAULT_LIMIT.toString(),
   type?: string,
   generation?: string,
-  search?: string
+  search?: string,
 ) {
   let allPokemon: any[] = [];
 
@@ -34,13 +34,11 @@ export async function getListPokemon(
 
   if (search) {
     let filteredBySearch = allPokemon.filter((p) =>
-      p.name.toLowerCase().includes(search.toLowerCase())
+      p.name.toLowerCase().includes(search.toLowerCase()),
     );
 
     const evolutionPromises = filteredBySearch.map(async (pokemon) => {
-      const speciesRes = await fetch(
-        `${API_URL}pokemon/${pokemon.name}`
-      );
+      const speciesRes = await fetch(`${API_URL}pokemon/${pokemon.name}`);
       const speciesData = await speciesRes.json();
       const evolutionChainUrl = speciesData.species.url;
 
@@ -96,7 +94,7 @@ export async function getListPokemon(
         generation: species.generation.name,
         bgClass,
       };
-    })
+    }),
   );
 
   return {
@@ -106,7 +104,7 @@ export async function getListPokemon(
 }
 
 export async function getPokemonCardData(
-  name: string
+  name: string,
 ): Promise<PokemonCardProps> {
   const res = await fetch(`${API_URL}pokemon/${name}`);
   const pokemon = await res.json();
@@ -134,7 +132,7 @@ export async function getPokemonCardData(
 
 export async function getTypes(name?: string) {
   const res = await fetch(
-    `${API_URL}type?${name ? `/${name}` : "/?limit=100"}`
+    `${API_URL}type?${name ? `/${name}` : "/?limit=100"}`,
   );
   const data = await res.json();
   return data.results;
@@ -142,7 +140,7 @@ export async function getTypes(name?: string) {
 
 export async function getGenerations(name?: string) {
   const res = await fetch(
-    `${API_URL}generation?${name ? `/${name}` : "/?limit=100"}`
+    `${API_URL}generation?${name ? `/${name}` : "/?limit=100"}`,
   );
   const data = await res.json();
   return data.results;

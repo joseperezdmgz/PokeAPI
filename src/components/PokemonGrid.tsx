@@ -25,10 +25,10 @@ export default function PokemonGrid() {
   const [limit] = useState<number>(DEFAULT_LIMIT);
   const [type, setType] = useState<string>(searchParams.get("type") || "");
   const [generation, setGeneration] = useState<string>(
-    searchParams.get("generation") || ""
+    searchParams.get("generation") || "",
   );
   const [search, setSearch] = useState<string>(
-    searchParams.get("search") || ""
+    searchParams.get("search") || "",
   );
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function PokemonGrid() {
           limit.toString(),
           type,
           generation,
-          search
+          search,
         );
 
         setPokemons((prev) => [...prev, ...data.results]);
@@ -76,7 +76,7 @@ export default function PokemonGrid() {
           setOffset((prev) => prev + limit);
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.5 },
     );
 
     observer.observe(loaderRef.current);
