@@ -33,9 +33,41 @@ export async function getListPokemon(
   }
 
   if (search) {
-    allPokemon = allPokemon.filter((p) =>
+    let filteredBySearch = allPokemon.filter((p) =>
       p.name.toLowerCase().includes(search.toLowerCase())
     );
+
+    const evolutionPromises = filteredBySearch.map(async (pokemon) => {
+      const speciesRes = await fetch(
+        `${API_URL}pokemon/${pokemon.name}`
+      );
+      const speciesData = await speciesRes.json();
+      const evolutionChainUrl = speciesData.species.url;
+
+      const evolutionChainRes = await fetch(evolutionChainUrl);
+      const evolutionChainData = await evolutionChainRes.json();
+      const chainUrl = evolutionChainData.evolution_chain.url;
+
+      const finalEvolutionRes = await fetch(chainUrl);
+      const finalEvolutionData = await finalEvolutionRes.json();
+
+      const getEvolutionNames = (chain: any) => {
+        const names = [chain.species.name];
+        if (chain.evolves_to.length > 0) {
+          chain.evolves_to.forEach((evolution: any) => {
+            names.push(...getEvolutionNames(evolution));
+          });
+        }
+        return names;
+      };
+
+      return getEvolutionNames(finalEvolutionData.chain);
+    });
+
+    const allEvolutionNames = (await Promise.all(evolutionPromises)).flat();
+    const uniqueNames = new Set(allEvolutionNames);
+
+    allPokemon = allPokemon.filter((p) => uniqueNames.has(p.name));
   }
 
   const start = Number(offset);
