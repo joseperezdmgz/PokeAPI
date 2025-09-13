@@ -12,7 +12,11 @@ export default function SearchFilter({
 }) {
   const [inputValue, setInputValue] = useState(search);
   const debouncedSearch = useDebounce(inputValue, 500);
-  
+
+  useEffect(() => {
+    setInputValue(search);
+  }, [search]);
+
   useEffect(() => {
     setSearch(debouncedSearch);
   }, [debouncedSearch, setSearch]);
