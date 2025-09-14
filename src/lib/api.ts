@@ -1,16 +1,46 @@
-import { PokemonCardProps } from "@/lib/types";
+import {
+  PokemonCardProps,
+  PokemonViewProps,
+  EvolutionProps,
+} from "@/lib/types";
 import { typeColors } from "@/lib/translation";
 
 const API_URL = process.env.API_URL;
+
 export const DEFAULT_LIMIT = 20;
 export const DEFAULT_OFFSET = 0;
+
+const getEvolutionNames = (chain: any): string[] => {
+  const names = [chain.species.name];
+  if (chain.evolves_to.length > 0) {
+    chain.evolves_to.forEach((evolution: any) => {
+      names.push(...getEvolutionNames(evolution));
+    });
+  }
+  return names;
+};
+
+const getEvolutionDetails = async (
+  names: string[]
+): Promise<EvolutionProps[]> => {
+  const evolutionPromises = names.map(async (name) => {
+    const res = await fetch(`${API_URL}pokemon/${name}`);
+    const pokemon = await res.json();
+    return {
+      id: pokemon.id,
+      name: pokemon.name,
+      sprite: pokemon.sprites.other["official-artwork"].front_default,
+    };
+  });
+  return Promise.all(evolutionPromises);
+};
 
 export async function getListPokemon(
   offset: string = DEFAULT_OFFSET.toString(),
   limit: string = DEFAULT_LIMIT.toString(),
   type?: string,
   generation?: string,
-  search?: string,
+  search?: string
 ) {
   let allPokemon: any[] = [];
 
@@ -34,7 +64,7 @@ export async function getListPokemon(
 
   if (search) {
     let filteredBySearch = allPokemon.filter((p) =>
-      p.name.toLowerCase().includes(search.toLowerCase()),
+      p.name.toLowerCase().includes(search.toLowerCase())
     );
 
     const evolutionPromises = filteredBySearch.map(async (pokemon) => {
@@ -48,16 +78,6 @@ export async function getListPokemon(
 
       const finalEvolutionRes = await fetch(chainUrl);
       const finalEvolutionData = await finalEvolutionRes.json();
-
-      const getEvolutionNames = (chain: any) => {
-        const names = [chain.species.name];
-        if (chain.evolves_to.length > 0) {
-          chain.evolves_to.forEach((evolution: any) => {
-            names.push(...getEvolutionNames(evolution));
-          });
-        }
-        return names;
-      };
 
       return getEvolutionNames(finalEvolutionData.chain);
     });
@@ -94,7 +114,7 @@ export async function getListPokemon(
         generation: species.generation.name,
         bgClass,
       };
-    }),
+    })
   );
 
   return {
@@ -104,7 +124,7 @@ export async function getListPokemon(
 }
 
 export async function getPokemonCardData(
-  name: string,
+  name: string
 ): Promise<PokemonCardProps> {
   const res = await fetch(`${API_URL}pokemon/${name}`);
   const pokemon = await res.json();
@@ -130,9 +150,44 @@ export async function getPokemonCardData(
   };
 }
 
+export async function getPokemonViewData(
+  name: string
+): Promise<PokemonViewProps> {
+  const res = await fetch(`${API_URL}pokemon/${name}`);
+  const pokemon = await res.json();
+
+  const sprite =
+    pokemon.sprites.other.dream_world.front_default ||
+    pokemon.sprites.other["official-artwork"].front_default ||
+    pokemon.sprites.other.home.front_default ||
+    pokemon.sprites.front_default;
+
+  const speciesRes = await fetch(pokemon.species.url);
+  const species = await speciesRes.json();
+
+  const evolutionChainRes = await fetch(species.evolution_chain.url);
+  const evolutionChain = await evolutionChainRes.json();
+
+  const bgClass = typeColors[pokemon.types[0].type.name] || typeColors.normal;
+
+  const evolutionNames = getEvolutionNames(evolutionChain.chain);
+  const evolutions = await getEvolutionDetails(evolutionNames);
+
+  return {
+    id: pokemon.id,
+    name: pokemon.name,
+    sprite,
+    types: pokemon.types,
+    generation: species.generation.name,
+    bgClass: bgClass,
+    stats: pokemon.stats,
+    evolutions: evolutions,
+  };
+}
+
 export async function getTypes(name?: string) {
   const res = await fetch(
-    `${API_URL}type?${name ? `/${name}` : "/?limit=100"}`,
+    `${API_URL}type?${name ? `/${name}` : "/?limit=100"}`
   );
   const data = await res.json();
   return data.results;
@@ -140,7 +195,7 @@ export async function getTypes(name?: string) {
 
 export async function getGenerations(name?: string) {
   const res = await fetch(
-    `${API_URL}generation?${name ? `/${name}` : "/?limit=100"}`,
+    `${API_URL}generation?${name ? `/${name}` : "/?limit=100"}`
   );
   const data = await res.json();
   return data.results;
