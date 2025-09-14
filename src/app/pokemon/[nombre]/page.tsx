@@ -1,6 +1,8 @@
 import { getPokemonViewData } from "@/lib/api";
 import ButtonBack from "@/components/ButtonBack";
 import PokemonStats from "@/components/PokemonStats";
+import { typeColors } from "@/lib/translation";
+import { formatGenerationName } from "@/utils/format";
 import Link from "next/link";
 
 export default async function Pokemon({
@@ -24,6 +26,19 @@ export default async function Pokemon({
           <h2 className="text-lg font-bold capitalize text-gray-500">
             #{pokemon.id.toString().padStart(3, "0")}
           </h2>
+          <div className="flex gap-4 items-center">
+            {pokemon.types.map((type) => (
+              <span
+                key={type.type.name}
+                className={`${
+                  typeColors[type.type.name]
+                } px-2 py-1 rounded-full capitalize text-white`}
+              >
+                {type.type.name}
+              </span>
+            ))}
+            <p className="text-gray-500 border px-2 py-1 rounded-full">{formatGenerationName(pokemon.generation)}</p>
+          </div>
         </div>
         <ul className="flex gap-4 items-center justify-center flex-col md:flex-row">
           <li className="md:w-1/2 p-4 flex items-center justify-center">
