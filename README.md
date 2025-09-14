@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PokeAPI
 
-## Getting Started
+Este proyecto es una aplicación web desarrollada con Next.js y TypeScript que muestra un listado de Pokémon y sus detalles, cumpliendo con los requisitos de la prueba técnica de [Nombre de la Empresa].
 
-First, run the development server:
+---
+
+### **Funcionalidades**
+
+El proyecto incluye las siguientes características:
+
+- **Listado de Pokémon:** Muestra el nombre, imagen, tipos, generación y stats de cada Pokémon.
+- **Scroll Infinito:** El listado se carga dinámicamente, en lugar de usar paginación.
+- **Filtros en Tiempo Real:** Permite buscar y filtrar por nombre (incluyendo evoluciones), tipo y generación.
+- **Página de Detalles:** Navega a una página con la información completa de cada Pokémon, incluyendo su cadena de evolución.
+- **Persistencia de Estado:** Los filtros y el estado de la lista se mantienen al volver a la página principal.
+
+---
+
+### **Tecnologías Utilizadas**
+
+- **Next.js 15.5:** Framework de React para el renderizado del lado del servidor.
+- **TypeScript:** Para el tipado estático y la robustez del código.
+- **Tailwind CSS:** Para un diseño rápido y personalizable.
+- **PokeAPI:** API pública para la información de los Pokémon.
+
+---
+
+### **Instalación y Uso en Local**
+
+Sigue estos pasos para ejecutar el proyecto en tu máquina local.
+
+#### 1. Clonar el repositorio
+
+```bash
+git clone [https://github.com/joseperezdmgz/PokeAPI](https://github.com/joseperezdmgz/PokeAPI)
+cd PokeAPI
+```
+
+#### 2. Instalar dependencias
+
+```bash
+npm install
+```
+
+#### 3. Ejecutar el proyecto
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+El proyecto se ejecutará en `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### **Desarrollado por**
 
-## Learn More
+- **José Pérez** - [https://github.com/joseperezdmgz](https://github.com/joseperezdmgz)
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
