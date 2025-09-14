@@ -69,7 +69,7 @@ export default function PokemonCard({ name }: { name: string }) {
               key={type.type.name}
               className={`${
                 typeColors[type.type.name]
-              } px-2 py-1 rounded-full capitalize`}
+              } px-2 py-1 rounded-full capitalize text-white`}
             >
               {type.type.name}
             </span>

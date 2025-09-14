@@ -18,7 +18,7 @@ export default function GenerationFilter({
   }, []);
   return (
     <select
-      className="p-2 border rounded bg-white text-black placeholder:text-gray-500 border-gray-300 focus:outline-none capitalize"
+      className="p-2 border rounded bg-white dark:text-black placeholder:text-gray-500 border-gray-300 focus:outline-none capitalize"
       onChange={(e) => setGeneration(e.target.value)}
       value={generation}
     >
